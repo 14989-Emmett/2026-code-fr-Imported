@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.IntakePivotSubsystem;
 import frc.robot.Constants.OIConstants;
 
+//Limelight
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 
 /**
@@ -50,6 +53,8 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }
 
+       // Get the default NetworkTables instance
+        NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     /*try{
       m_Hook = new HookSubsystem(); //Initializes the intake pivot subsystem so that we can read the encoder value in the next line
       m_Hook.readHookEncoder(); //Calls the readHookEncoder method in Hook
@@ -67,8 +72,19 @@ public class Robot extends TimedRobot {
       System.out.println("Elevator Subsystem failed to initialize. Check wiring and CAN ID, function robotInit.");
       e.printStackTrace();
     }*/
-  }
 
+  
+    limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
+    try {
+      m_robotIntakePivot = new IntakePivotSubsystem();
+      m_robotIntakePivot.readIntakePivotEncoder();
+      m_robotContainer.SetIntakePivot(m_robotIntakePivot);
+    } catch (Exception e) {
+      System.out.println("Intake Pivot Subsystem failed to initialize. Check wiring and CAN ID, function robotInit.");
+      e.printStackTrace();
+    }
+  }
   /**
    * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
    * that you want ran during disabled, autonomous, teleoperated and test.
@@ -76,6 +92,8 @@ public class Robot extends TimedRobot {
    * <p>This runs after the mode specific periodic functions, but before LiveWindow and
    * SmartDashboard integrated updating.
    */
+
+/*
   @Override
   public void robotPeriodic() {
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
@@ -87,7 +105,7 @@ public class Robot extends TimedRobot {
     //Limelight
     double omegaRps = Units.degreesToRotations(m_robotContainer.m_robotDrive.getTurnRate());
     var llMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
-/*
+
     new Trigger(m_driverController::getLeftBumper)
     .whileTrue(new RunCommand(
       () -> m_robotDrive.drive(
@@ -99,12 +117,12 @@ public class Robot extends TimedRobot {
       ),
       m_robotDrive
   ));
-*/
+
     if (llMeasurement != null && llMeasurement.tagCount > 0 && Math.abs(omegaRps) < 2.0) {
       m_robotContainer.m_robotDrive.resetOdometry(llMeasurement.pose);
     }
   }
-
+*/
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {}
@@ -147,7 +165,15 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+
+    // Example: Get Limelight X and Y offsets
+    double tx = limelightTable.getEntry("tx").getDouble(0.0); // Horizontal offset
+    double ty = limelightTable.getEntry("ty").getDouble(0.0); // Vertical offset
+    boolean tv = limelightTable.getEntry("tv").getDouble(0) == 1.0; // target valid
+
+    System.out.println("Limelight X: " + tx + ", Y: " + ty + ", Target?: " + tv);
+  }
 
   @Override
   public void testInit() {
@@ -158,4 +184,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+
 }
