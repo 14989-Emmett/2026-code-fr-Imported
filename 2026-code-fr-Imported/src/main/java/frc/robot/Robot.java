@@ -35,7 +35,10 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  /**
+    // Get the default NetworkTables instance
+    NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+    
+   /*
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
@@ -53,8 +56,8 @@ public class Robot extends TimedRobot {
       e.printStackTrace();
     }
 
-       // Get the default NetworkTables instance
-        NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+
+
     /*try{
       m_Hook = new HookSubsystem(); //Initializes the intake pivot subsystem so that we can read the encoder value in the next line
       m_Hook.readHookEncoder(); //Calls the readHookEncoder method in Hook
